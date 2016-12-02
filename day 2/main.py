@@ -26,3 +26,5 @@ for move in input:
             if keypad[ud][lr-1] is not 'x':
                 lr -= 1
     print(keypad[ud][lr])
+
+input.close()
