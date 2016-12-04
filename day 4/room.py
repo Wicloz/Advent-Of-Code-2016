@@ -3,6 +3,7 @@ class Room:
         self.room_enc, rest = line.rsplit('-', 1)
         self.sid = int(rest.split('[')[0])
         self.checksum = rest.split('[')[1].split(']')[0]
+        self.room_dec = ''
 
     def real(self):
         letters = {}
@@ -21,3 +22,10 @@ class Room:
 
     def number_tuple(self, tup):
         return tup[1] * 100 - ord(tup[0]) + 96
+
+    def decrypt(self):
+        for c in self.room_enc:
+            if c is '-':
+                self.room_dec += ' '
+            else:
+                self.room_dec += chr(((ord(c) - 97 + self.sid) % 26) + 97)
