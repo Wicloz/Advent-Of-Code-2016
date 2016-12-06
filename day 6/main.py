@@ -11,7 +11,7 @@ for line in input:
 
 word = ''
 for i in range(0, len(motif)):
-    motif[i] = sorted(motif[i], key=motif[i].__getitem__, reverse=True)
+    motif[i] = sorted(motif[i], key=motif[i].__getitem__)
     word += motif[i][0]
 
 print(word)
