@@ -22,11 +22,8 @@ class Robot:
                 low, high = self.chips
             if self.high_to_type == "bot":
                 self.high_to.work()
-                self.high_to.add_chip(high)
+            self.high_to.add_chip(high)
             if self.low_to_type == "bot":
                 self.low_to.work()
-                self.low_to.add_chip(low)
+            self.low_to.add_chip(low)
             self.chips = []
-
-    def check(self):
-        return len(self.chips) == 2 and ((self.chips[0] == 61 and self.chips[1] == 17) or (self.chips[0] == 17 and self.chips[1] == 61))
