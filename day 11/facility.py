@@ -4,7 +4,7 @@ visited = []
 
 class Facility:
     # pairs = [(1, 0), (2, 0)]
-    pairs = [(0, 0), (1, 2), (1, 2), (1, 2), (1, 2)]
+    pairs = [(0, 0), (0, 0), (0, 0), (1, 2), (1, 2), (1, 2), (1, 2)]
     current_floor = 0
 
     def copy(self):
