@@ -2,7 +2,7 @@ input = open('input.txt', 'r')
 lines = input.readlines()
 input.close()
 
-regs = {'a':0, 'b':0, 'c':0, 'd':0}
+regs = {'a':0, 'b':0, 'c':1, 'd':0}
 index = 0
 
 while index < len(lines):
