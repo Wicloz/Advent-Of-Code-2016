@@ -1,79 +1,67 @@
 import copy
 
+visited = []
+
 class Facility:
-    chips = [['Pr'], [], ['Co', 'Cu', 'Ru', 'Pl'], []]
-    generators = [['Pr'], ['Co', 'Cu', 'Ru', 'Pl'], [], []]
+    # pairs = [(1, 0), (2, 0)]
+    pairs = [(0, 0), (1, 2), (1, 2), (1, 2), (1, 2)]
     current_floor = 0
-    last_move = []
 
     def copy(self):
         other = Facility()
-        other.chips = copy.deepcopy(self.chips)
-        other.generators = copy.deepcopy(self.generators)
+        other.pairs = copy.deepcopy(self.pairs)
         other.current_floor = self.current_floor
-        other.last_move = copy.deepcopy(self.last_move)
         return other
 
     def valid(self):
-        for i in range(4):
-            if len(self.generators[i]) > 0:
-                for chip in self.chips[i]:
-                    if chip not in self.generators[i]:
-                        return False
-        return True
-
-    def done(self):
-        for i in range(3):
-            if len(self.chips[i]) > 0 or len(self.generators[i]) > 0:
+        dangerfloors = []
+        for pair in self.pairs:
+            dangerfloors.append(pair[0])
+        for pair in self.pairs:
+            if pair[0] != pair[1] and pair[1] in dangerfloors:
                 return False
         return True
 
-    def perform_move(self, to_floor, chips, generators):
-        self.last_move = [self.current_floor, chips, generators]
-        for chip in chips:
-            self.chips[self.current_floor].remove(chip)
-        self.chips[to_floor] += chips
-        for gen in generators:
-            self.generators[self.current_floor].remove(gen)
-        self.generators[to_floor] += generators
-        self.current_floor = to_floor
+    def done(self):
+        for pair in self.pairs:
+            if pair[0] != 3 or pair[1] != 3:
+                return False
+        return True
+
+    def perform_move(self, diff, move1, move2):
+        if move1[1] == 0:
+            self.pairs[move1[0]] = (self.pairs[move1[0]][0] + diff, self.pairs[move1[0]][1])
+        else:
+            self.pairs[move1[0]] = (self.pairs[move1[0]][0], self.pairs[move1[0]][1] + diff)
+        if move2 != None:
+            if move2[1] == 0:
+                self.pairs[move2[0]] = (self.pairs[move2[0]][0] + diff, self.pairs[move2[0]][1])
+            else:
+                self.pairs[move2[0]] = (self.pairs[move2[0]][0], self.pairs[move2[0]][1] + diff)
+        self.pairs.sort()
+        self.current_floor += diff
 
     def find_moves(self):
         moves = []
+        items = []
+        diffs = []
 
-        chips = self.chips[self.current_floor]
-        for i in range(len(chips)):
-            if self.current_floor < 3:
-                moves.append([self.current_floor + 1, [chips[i]], []])
-            if self.current_floor > 0:
-                moves.append([self.current_floor - 1, [chips[i]], []])
-            for j in range(i + 1, len(chips)):
-                if self.current_floor < 3:
-                    moves.append([self.current_floor + 1, [chips[i], chips[j]], []])
-                if self.current_floor > 0:
-                    moves.append([self.current_floor - 1, [chips[i], chips[j]], []])
+        if self.current_floor > 0:
+            diffs.append(-1)
+        if self.current_floor < 3:
+            diffs.append(1)
 
-        generators = self.generators[self.current_floor]
-        for i in range(len(generators)):
-            if self.current_floor < 3:
-                moves.append([self.current_floor + 1, [], [generators[i]]])
-            if self.current_floor > 0:
-                moves.append([self.current_floor - 1, [], [generators[i]]])
-            for j in range(i + 1, len(generators)):
-                if self.current_floor < 3:
-                    moves.append([self.current_floor + 1, [], [generators[i], generators[j]]])
-                if self.current_floor > 0:
-                    moves.append([self.current_floor - 1, [], [generators[i], generators[j]]])
+        for i in range(len(self.pairs)):
+            for j in range(2):
+                if self.pairs[i][j] == self.current_floor:
+                    items.append((i, j))
 
-        for chip in chips:
-            for generator in generators:
-                if self.current_floor < 3:
-                    moves.append([self.current_floor + 1, [chip], [generator]])
-                if self.current_floor > 0:
-                    moves.append([self.current_floor - 1, [chip], [generator]])
+        for diff in diffs:
+            for i in range(len(items)):
+                moves.append([diff, items[i], None])
+                for j in range(i + 1, len(items)):
+                    moves.append([diff, items[i], items[j]])
 
-        if self.last_move in moves:
-            moves.remove(self.last_move)
         return moves
 
     def get_next_states(self):
@@ -81,6 +69,7 @@ class Facility:
         for move in self.find_moves():
             other = self.copy()
             other.perform_move(*move)
-            if other.valid():
+            if (other.current_floor, other.pairs) not in visited and other.valid():
                 states.append(other)
+                visited.append((other.current_floor, other.pairs))
         return states
